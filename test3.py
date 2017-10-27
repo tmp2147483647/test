@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*- 
 ######################################################################
 ### Date: 2017/10/26
@@ -10,7 +9,7 @@
 #GPIO  library를 임포트 한다.
 import RPi.GPIO as GPIO 
 from time import sleep
-
+from ultraModule import getDistance
 # =======================================================================
 #좌우측 모터 드라이버와 연결되는 GPIO 핀 6개를 할당한다.
 #좌우측 모터 전진/후진 결정 변수:(MotorLeft_A, MotorLeft_B), (MotorRight_A, MotorRight_B)
@@ -130,6 +129,17 @@ def PointTurn(Direction, speed, running_time):
         LeftPwm.ChangeDutyCycle(speed)
         RightPwm.ChangeDutyCycle(speed)
     sleep(running_time)
+
+def pwm_setup():
+    LeftPwm.start(0)
+    RightPwm.start(0)
+
+def pwm_low():
+    GPIO.output(MotorLeft_PWM, GPIO.LOW)
+    GPIO.output(MotorRight_PWM, GPIO.LOW)
+    LeftPwm.ChangeDutyCycle(0)
+    RightPwm.ChangeDutyCycle(0)
+    GPIO.cleanup()
 # =======================================================================
 
 # =======================================================================
@@ -150,17 +160,15 @@ def stop():
 if __name__=="__main__":
     try:
         LeftPwm,RightPwm=SetUp()
-       
-        LeftPwm.start(0)
-        RightPwm.start(0)
-        go_forward(40, 3)
-        sleep(1)
-        go_backward(40, 3)
-        sleep(1)
-        PointTurn('R',40,3)
+        pwm_setup()
+        #go_forward(40, 3)
+        #sleep(1)
+        #go_backward(40, 3)
+        #sleep(1)
+        #PointTurn('R',40,3)
         #SwingTurn('R',40,3)
-        sleep(1)
-        stop()
+        #sleep(1)
+        #stop()
     except KeyboardInterrupt:
         # the speed of left motor will be set as LOW
         GPIO.output(MotorLeft_PWM,GPIO.LOW)
@@ -172,4 +180,29 @@ if __name__=="__main__":
         RightPwm.ChangeDutyCycle(0)
         # GPIO pin setup has been cleared
         GPIO.cleanup()
-# =======================================================================
+    try:
+        while True:
+            # ultra sensor replies the distance back
+            distance = getDistance()
+            print('distance= ', distance)
+
+            # when the distance is above the dis, moving object forwards
+            if (distance > dis):
+                go_forward_any(50)
+                print('obstacle=', obstacle)
+            # when the distance is below the dis, moving object stops
+            else:
+                # stop and wait 1 second
+                stop()
+                sleep(1)
+
+
+                        ###please continue the code or change the above code
+            ### # student assignment (10)
+            ########################################################
+            # when the Ctrl+C key has been pressed,
+            # the moving object will be stopped
+    except KeyboardInterrupt:
+        pwm_low()
+        
+# ======================================================================
