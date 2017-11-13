@@ -88,19 +88,17 @@ class Calculator(QWidget):
             self.display.clear()
 
         elif key in constantList:
-            for i in range(4):
+            for i in range(len(constantList)):
                 if key == constantList[i]:
-                    self.display.setText(self.display.text() + constanvalue[i])
+                    self.display.setText(constanvalue[i])
 
 
         elif key in functionList:
-            for dic_key in calcFunctions.functionMap2.keys():
-                if key == dic_key:
-                    value=calcFunctions.functionMap2[dic_key](n)
-            #n = self.display.text()
-            #value = calcFunctions.functionMap[functionList.index(key)][1](n)
-            #value = calcFunctions.functionMap
-            #self.display.setText(str(value))
+            n = self.display.text()
+            if len(n) > 1:
+                n = eval(self.display.text())
+            value=calcFunctions.function_Dic[key](n)
+            self.display.setText(str(value))
 
 
 
